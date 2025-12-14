@@ -87,9 +87,15 @@ function initSmoothScrolling() {
     });
 }
 
+// Initialize EmailJS
+(function() {
+    emailjs.init('YOUR_PUBLIC_KEY'); // Replace with your EmailJS public key
+})();
+
 // Contact form functionality
 function initContactForm() {
     const contactForm = document.getElementById('contact-form');
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
     
     contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -111,9 +117,30 @@ function initContactForm() {
             return;
         }
         
-        // Simulate form submission (replace with actual form handling)
-        showNotification('Thank you for your message! I\'ll get back to you soon.', 'success');
-        this.reset();
+        // Disable submit button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        
+        // Send email using EmailJS
+        emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+            from_name: name,
+            from_email: email,
+            message: message,
+            to_email: 'kipkogeidennis05@gmail.com'
+        })
+        .then(function(response) {
+            showNotification('Message sent successfully! I\'ll get back to you soon.', 'success');
+            contactForm.reset();
+        })
+        .catch(function(error) {
+            showNotification('Failed to send message. Please try again or email me directly.', 'error');
+            console.error('EmailJS error:', error);
+        })
+        .finally(function() {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+        });
     });
 }
 
